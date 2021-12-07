@@ -11,7 +11,7 @@ import (
 
 // Handler is root url resource.
 func (app *App) Handler(w http.ResponseWriter, _ *http.Request) {
-	fmt.Fprint(w, "Server is Up and Running...")
+	_, _ = fmt.Fprint(w, "Server is Up and Running...")
 }
 
 // RecordListHandler is Mongo db records handler.
@@ -55,7 +55,7 @@ func (app *App) InMemoryCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.inMemoryDB.Write(entity.Key, entity.Value)
-	helper.RespondWithJSON(w, http.StatusOK, entity)
+	helper.RespondWithJSON(w, http.StatusCreated, entity)
 
 }
 
