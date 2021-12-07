@@ -40,7 +40,7 @@ func TestApp_InMemoryCreateHandler(t *testing.T) {
 	dataModel := models.Entity{Key: storeKey, Value: storeValue}
 	data, _ := json.Marshal(dataModel)
 
-	r, _ := http.NewRequest("POST", fmt.Sprintf("/in-memory"), strings.NewReader(string(data)))
+	r, _ := http.NewRequest("POST", "/in-memory", strings.NewReader(string(data)))
 	w := httptest.NewRecorder()
 
 	app.InMemoryCreateHandler(w, r)
