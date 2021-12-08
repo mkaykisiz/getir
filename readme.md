@@ -21,11 +21,18 @@ https://calm-ocean-71421.herokuapp.com/
 #Install
 create .env file or set environment variables
 ```text
-PORT:8000
+PORT=8000
 MONGO_DB_URL=
 MONGO_DB_NAME=
 MONGO_COLLECTION_NAME=
 ```
+
+**Docker install**
+```text
+$ docker build -t getir .
+$ docker run -d -p 8000:8000 --env-file .env getir
+```
+
 
 # Services
 ## Records
