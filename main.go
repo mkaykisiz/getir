@@ -1,12 +1,16 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"getir/app"
 	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 func init() {
@@ -24,6 +28,45 @@ func main() {
 	http.HandleFunc("/in-memory", appModule.InMemoryHandler)
 
 	port := fmt.Sprintf(":%s", os.Getenv("PORT"))
+
+	httpServer := &http.Server{
+		Addr: port,
+	}
+	go func() {
+		if err := httpServer.ListenAndServe(); err != http.ErrServerClosed {
+			log.Fatalf("HTTP server ListenAndServe: %v", err)
+		}
+	}()
+
 	log.Println("Server Listening on port", port)
-	log.Fatal(http.ListenAndServe(port, nil))
+
+	signalChan := make(chan os.Signal, 1)
+
+	signal.Notify(
+		signalChan,
+		syscall.SIGHUP,
+		syscall.SIGINT,
+		syscall.SIGQUIT,
+	)
+
+	<-signalChan
+	log.Println("Server Stopped")
+
+	go func() {
+		<-signalChan
+		log.Fatal("os.Kill - terminating...\n")
+	}()
+
+	gracefullCtx, cancelShutdown := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelShutdown()
+
+	if err := httpServer.Shutdown(gracefullCtx); err != nil {
+		log.Printf("shutdown error: %v\n", err)
+		defer os.Exit(1)
+		return
+	} else {
+		log.Println("gracefully stopped")
+	}
+
+	defer os.Exit(0)
 }
