@@ -13,15 +13,19 @@ import (
 
 // App is general http resources.
 type App struct {
-	mongoDB    *mongo.Database
+	mongoDB    *mongo.Collection
 	inMemoryDB *inmemory.DB
 }
 
 // Initialize is starting app.
 func (app *App) Initialize() {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	mongoURL := os.Getenv("MONGO_DB_URL")
+	mongoDBName := os.Getenv("MONGO_DB_NAME")
+	mongoCollection := os.Getenv("MONGO_COLLECTION_NAME")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGO_DB_URL")))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURL))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -30,6 +34,6 @@ func (app *App) Initialize() {
 		log.Println(err)
 	}
 
-	app.mongoDB = client.Database(os.Getenv("MONGO_DB_NAME"))
+	app.mongoDB = client.Database(mongoDBName).Collection(mongoCollection)
 	app.inMemoryDB = inmemory.New()
 }
