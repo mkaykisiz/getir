@@ -10,8 +10,8 @@ Getir Case
 
 ## Routers
 
-- `[POST] /records  | http://52.214.126.26:8080/records`
-- `[GET, POST] /in-memory | http://52.214.126.26:8080/n-memory`
+- `[POST] /records  | https://calm-ocean-71421.herokuapp.com/records`
+- `[GET, POST] /in-memory | https://calm-ocean-71421.herokuapp.com/in-memory`
 
 
 
