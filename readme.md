@@ -33,6 +33,27 @@ $ docker build -t getir .
 $ docker run -d -p 8000:8000 --env-file .env getir
 ```
 
+**Heroku Deploy**
+```text
+heroku login
+heroku create
+git push heroku master
+heroku open
+```
+**View logs**
+```text
+heroku logs --tail
+```
+
+**Heroku set env**
+```text
+heroku config:set PORT=8000
+heroku config:set MONGO_DB_URL=
+heroku config:set MONGO_DB_NAME=
+heroku config:set MONGO_COLLECTION_NAME=
+
+```
+
 
 # Services
 ## Records
