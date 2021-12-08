@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const RecordsCollectionName = "records"
+const dateFormat = "2006-01-02"
 
 //RecordFilter is filter parameters for records.
 type RecordFilter struct {
@@ -19,9 +19,9 @@ type RecordFilter struct {
 
 // Record is filtered record object.
 type Record struct {
-	Key        string `json:"key"`
-	CreatedAt  string `json:"createdAt"`
-	TotalCount int    `json:"totalCount"`
+	Key        string    `json:"key"`
+	CreatedAt  time.Time `json:"createdAt"`
+	TotalCount int       `json:"totalCount"`
 }
 
 // RecordsResponse is filtered response.
@@ -32,25 +32,28 @@ type RecordsResponse struct {
 }
 
 // GetRecordsByFilter is filter func by filter parameter on mongo.
-func GetRecordsByFilter(mongoDB *mongo.Database, filter RecordFilter) *RecordsResponse {
-	mongoFilter, err := bson.Marshal(filter)
-	if err != nil {
-		return &RecordsResponse{Code: 2, Msg: "Wrong Filter Error"}
-	}
-
+func GetRecordsByFilter(mongoDB *mongo.Collection, filter RecordFilter) *RecordsResponse {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
+	startDate, _ := time.Parse(dateFormat, filter.StartDate)
+	endDate, _ := time.Parse(dateFormat, filter.EndDate)
 
-	cur, err := mongoDB.Collection(RecordsCollectionName).Aggregate(ctx, mongoFilter)
+	filterQuery := []bson.M{
+		{"$match": bson.M{"createdAt": bson.M{"$gt": startDate, "$lt": endDate}}},
+		{"$project": bson.M{"_id": 1, "key": 1, "value": 1, "createdAt": 1, "totalCount": bson.M{"$sum": "$counts"}}},
+		{"$match": bson.M{"totalCount": bson.M{"$gt": filter.MinCount, "$lt": filter.MaxCount}}},
+	}
+
+	cur, err := mongoDB.Aggregate(ctx, filterQuery)
 	if err != nil {
-		return &RecordsResponse{Code: 3, Msg: "Collection Error"}
-
+		return &RecordsResponse{Code: 3, Msg: err.Error()}
 	}
 	defer cur.Close(ctx)
 
 	rec := new(RecordsResponse)
-	if err = cur.All(ctx, rec.Records); err != nil {
-		return &RecordsResponse{Code: 4, Msg: "Cursor Error"}
+	if err = cur.All(ctx, &rec.Records); err != nil {
+		return &RecordsResponse{Code: 4, Msg: err.Error()}
 	}
+
 	return rec
 }
