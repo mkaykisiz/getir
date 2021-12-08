@@ -33,7 +33,7 @@ type RecordsResponse struct {
 
 // GetRecordsByFilter is filter func by filter parameter on mongo.
 func GetRecordsByFilter(mongoDB *mongo.Collection, filter RecordFilter) *RecordsResponse {
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	startDate, _ := time.Parse(dateFormat, filter.StartDate)
 	endDate, _ := time.Parse(dateFormat, filter.EndDate)
