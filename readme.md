@@ -8,12 +8,24 @@ Getir Case
 </p>
 
 
-## Routers
+# Connection
+**Host:**
+```text
+https://calm-ocean-71421.herokuapp.com/
+```
 
+**Router:**
 - `[POST] /records  | https://calm-ocean-71421.herokuapp.com/records`
 - `[GET, POST] /in-memory | https://calm-ocean-71421.herokuapp.com/in-memory`
 
-
+#Install
+create .env file or set environment variables
+```text
+PORT:8000
+MONGO_DB_URL=
+MONGO_DB_NAME=
+MONGO_COLLECTION_NAME=
+```
 
 # Services
 ## Records
